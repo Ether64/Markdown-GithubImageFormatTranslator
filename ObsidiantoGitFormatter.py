@@ -1,57 +1,35 @@
-from email.mime import image
+import re
+from urllib.parse import quote_plus
 
-cdn = 'https://cdn.ethereal.bond/file/github-images/'
-imageTags = []
-imageData = []
-altText = []
+CDN = 'https://cdn.ethereal.bond/file/github-images/'
 
-def findImageData(markdownfile):
-    with open(markdownfile,'r+') as infile:
-        lines = infile.readlines()
-    
-    for line in lines:
-        if line.startswith('![['):
-            imageTags.append(line.rstrip())
-      
-    for line in imageTags:
-        
-        imageData.append(line.split(' ')[2].split(']')[0])
-    
-    infile.close()
-    return imageData,imageTags
 
-def formatConverter(oldimagenames): #take the images and extensions and provide it as a list
-    imagesFormatted = []
-    for imagename in oldimagenames:
-        formattedimagename = f'![]({cdn}Pasted+image+{imagename})'
-        imagesFormatted.append(formattedimagename)
-    return imagesFormatted
+# def link_subber(match: re.Match):
+#     image = match.group(1)
+#     quoted_image = quote_plus(image)
+#     return F"![]({cdn}{quoted_image})"
 
-def fileFormatWriter(filename):
-    with open(filename, 'r+') as infile:
-        lines = infile.readlines() #read file as entire string
-        
-        i = 0
-        j= 0
-        newFileContents = [] #create list that will contain contents of newly formatted file
-        for line in lines:
-            j = j+1
-            if line.startswith('![['):
-                newFileContents.append(line.replace(line, convertedData[i]+'\n')) #if line fits that ![[ syntax, append.
-                i = i+1
-            else:
-                newFileContents.append(line) #append everything else that doesn't meet the above syntax.
-        print(lines)
-                
-    
-        infile.seek(0)
-        infile.writelines(newFileContents)
-        infile.close()
 
-if __name__=='__main__':
-    markdownfile = input('Enter the markdown file you would like to convert to Github\'s image formatting ')
-    imageData, imageTags = findImageData(markdownfile)
-    convertedData = formatConverter(imageData) #the updated image tags put through the formatconverter function.
-    fileFormatWriter(markdownfile)
+def convert_links(markdown_str) -> str:
+    # subbed = re.sub(r'\!\[\[(.*)\]\]', link_subber, contents)
+    subbed = re.sub(
+        r'\!\[\[(.*)\]\]', lambda match: F"![]({CDN+quote_plus(match.group(1))})", markdown_str)
+    return subbed
+
+
+def main():
+    markdown_file = input(
+        'Enter the markdown file you would like to convert to Github\'s image formatting: ')
+    with open(markdown_file, 'r') as f:
+        contents = f.read()
+
+    new_markdown = convert_links(contents)
+
+    with open(markdown_file.replace('.md', '.gh.md'), 'w') as f:
+        f.write(new_markdown)
+
+
+if __name__ == '__main__':
+    main()
 
 #![This is an image](https://myoctocat.com/assets/images/base-octocat.svg)  .... Example Github Image Formatting
