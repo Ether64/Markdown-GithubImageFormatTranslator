@@ -11,7 +11,6 @@ export default class DopePlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
 		const _ribbon = this.addRibbonIcon('checkmark', 'Sample Plugin', async (evt: MouseEvent) => {
 			const currentFile = this.app.workspace.getActiveFile() ?? new TFile();
 
