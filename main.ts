@@ -27,7 +27,7 @@ export default class DopePlugin extends Plugin {
 							/%20/g,
 							"+"
 						);
-						return "![]" + CDN + link;
+						return `![](${CDN}${link})`;
 					}
 				);
 
